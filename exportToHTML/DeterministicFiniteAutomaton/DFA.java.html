@@ -1,0 +1,621 @@
+<html>
+<head>
+<title>DFA.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(204,120,50); }
+.s1 { color: rgb(169,183,198); }
+.s2 { color: rgb(98,151,85); font-style: italic; }
+.s3 { color: rgb(98,151,85); font-weight: bold; font-style: italic; }
+.s4 { color: rgb(119,183,103); font-style: italic; }
+.s5 { color: rgb(104,151,187); }
+.s6 { color: rgb(128,128,128); }
+.s7 { color: rgb(106,135,89); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+DFA.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<span class="s0">package </span><span class="s1">DeterministicFiniteAutomaton</span><span class="s0">;</span><span class="s1"> 
+ 
+ 
+</span><span class="s0">import </span><span class="s1">java.util.*</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s2">/** 
+ * Un oggetto della classe DFA rappresenta un automa a stati finiti 
+ * deterministico 
+ */</span><span class="s1"> 
+</span><span class="s0">public class </span><span class="s1">DFA { 
+  </span><span class="s2">/** 
+   * Numero degli stati dell'automa. Ogni stato e` rappresentato da 
+   * un numero interno non negativo, lo stato con indice 0 e` lo 
+   * stato iniziale. 
+   */</span><span class="s1"> 
+  </span><span class="s0">private int </span><span class="s1">numberOfStates</span><span class="s0">;</span><span class="s1"> 
+ 
+  </span><span class="s2">/** 
+   * Insieme degli stati finali dell'automa. 
+   */</span><span class="s1"> 
+  </span><span class="s0">private </span><span class="s1">HashSet&lt;Integer&gt; finalStates</span><span class="s0">;</span><span class="s1"> 
+ 
+  </span><span class="s2">/** 
+   * Funzione di transizione dell'automa, rappresentata come una 
+   * mappa da mosse a stati di arrivo. 
+   */</span><span class="s1"> 
+  </span><span class="s0">private </span><span class="s1">HashMap&lt;Move</span><span class="s0">, </span><span class="s1">Integer&gt; transitions</span><span class="s0">;</span><span class="s1"> 
+ 
+  </span><span class="s2">/** 
+   * Crea un DFA con un dato numero di stati. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">n Il numero di stati dell'automa. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">DFA(</span><span class="s0">int </span><span class="s1">n) { 
+    numberOfStates = n</span><span class="s0">;</span><span class="s1"> 
+    finalStates = </span><span class="s0">new </span><span class="s1">HashSet&lt;Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+    transitions = </span><span class="s0">new </span><span class="s1">HashMap&lt;Move</span><span class="s0">, </span><span class="s1">Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Aggiunge uno stato all'automa. 
+   * 
+   * </span><span class="s3">@return </span><span class="s2">L'indice del nuovo stato creato 
+   */</span><span class="s1"> 
+  </span><span class="s0">public int </span><span class="s1">newState() { 
+    </span><span class="s0">return </span><span class="s1">numberOfStates++</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Aggiunge una transizione all'automa. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">p  Lo stato di partenza della transizione. 
+   * </span><span class="s3">@param </span><span class="s2">ch Il simbolo che etichetta la transizione. 
+   * </span><span class="s3">@param </span><span class="s2">q  Lo stato di arrivo della transizione. 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se lo stato di partenza e lo stato di 
+   * arrivo sono validi, </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">setMove(</span><span class="s0">int </span><span class="s1">p</span><span class="s0">, char </span><span class="s1">ch</span><span class="s0">, int </span><span class="s1">q) { 
+    </span><span class="s0">if </span><span class="s1">(!validState(p) || !validState(q)) 
+      </span><span class="s0">return false;</span><span class="s1"> 
+ 
+    transitions.put(</span><span class="s0">new </span><span class="s1">Move(p</span><span class="s0">, </span><span class="s1">ch)</span><span class="s0">, </span><span class="s1">q)</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return true;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Aggiunge uno stato finale. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">p Lo stato che si vuole aggiungere a quelli finali. 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se lo stato e` valido, 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">addFinalState(</span><span class="s0">int </span><span class="s1">p) { 
+    </span><span class="s0">if </span><span class="s1">(validState(p)) { 
+      finalStates.add(p)</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">return true;</span><span class="s1"> 
+    } </span><span class="s0">else</span><span class="s1"> 
+      </span><span class="s0">return false;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Determina se uno stato e` valido oppure no. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">p Lo stato da controllare. 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se lo stato e` valido, 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   * </span><span class="s3">@see </span><span class="s2">#numberOfStates 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">validState(</span><span class="s0">int </span><span class="s1">p) { 
+    </span><span class="s0">return </span><span class="s1">(p &gt;= </span><span class="s5">0 </span><span class="s1">&amp;&amp; p &lt; numberOfStates)</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Determina se uno stato e` finale oppure no. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">p Lo stato da controllare. 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se lo stato e` finale, 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   * </span><span class="s3">@see </span><span class="s2">#finalStates 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">finalState(</span><span class="s0">int </span><span class="s1">p) { 
+    </span><span class="s0">return </span><span class="s1">finalStates.contains(p)</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Restituisce il numero di stati dell'automa. 
+   * 
+   * </span><span class="s3">@return </span><span class="s2">Numero di stati. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public int </span><span class="s1">numberOfStates() { 
+    </span><span class="s0">return </span><span class="s1">numberOfStates</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Restituisce l'alfabeto dell'automa, ovvero l'insieme di simboli 
+   * che compaiono come etichette delle transizioni dell'automa. 
+   * 
+   * </span><span class="s3">@return </span><span class="s2">L'alfabeto dell'automa. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">HashSet&lt;Character&gt; alphabet() { 
+    HashSet&lt;Character&gt; alphabet = </span><span class="s0">new </span><span class="s1">HashSet&lt;Character&gt;()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(Move m : transitions.keySet()) 
+      alphabet.add(m.ch)</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return </span><span class="s1">alphabet</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esegue una mossa dell'automa. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">p  Stato di partenza prima della transizione. 
+   * </span><span class="s3">@param </span><span class="s2">ch Simbolo da riconoscere. 
+   * </span><span class="s3">@return </span><span class="s2">Stato di arrivo dopo la transizione, oppure 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">-1</span><span class="s4">&lt;/code&gt; </span><span class="s2">se l'automa non ha una transizione 
+   * etichettata con </span><span class="s4">&lt;code&gt;</span><span class="s2">ch</span><span class="s4">&lt;/code&gt; </span><span class="s2">dallo stato 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">p</span><span class="s4">&lt;/code&gt;</span><span class="s2">. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public int </span><span class="s1">move(</span><span class="s0">int </span><span class="s1">p</span><span class="s0">, char </span><span class="s1">ch) { 
+    Move move = </span><span class="s0">new </span><span class="s1">Move(p</span><span class="s0">, </span><span class="s1">ch)</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">if </span><span class="s1">(transitions.containsKey(move)) 
+      </span><span class="s0">return </span><span class="s1">transitions.get(move)</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">else</span><span class="s1"> 
+      </span><span class="s0">return </span><span class="s1">-</span><span class="s5">1</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 2.2 
+   * Verifica se una stringa e` riconosciuta dall'automa. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">s Stringa da riconoscere. 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se la stringa e` stata riconosciuta, 
+   * </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">scan(String s) { 
+    </span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">state = </span><span class="s5">0</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">while </span><span class="s1">(i &lt; s.length()) { 
+      </span><span class="s0">final char </span><span class="s1">ch = s.charAt(i++)</span><span class="s0">;</span><span class="s1"> 
+      state = move(state</span><span class="s0">, </span><span class="s1">ch)</span><span class="s0">;</span><span class="s6">//effettuo una transizione e finisco in un nuovo stato</span><span class="s1"> 
+    } 
+    </span><span class="s0">return </span><span class="s1">finalState(state)</span><span class="s0">;</span><span class="s6">//se ci si trova in uno stato finale true altrimenti false.</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 2.4 
+   * controlla se un dfa è completo: in ogni stato è definita una transizione per ogni simbolo dell'alfabeto 
+   * 
+   * </span><span class="s3">@return </span><span class="s2">true se la funzione di transizione di un DFA `e definita per tutti gli stati dell’automa e i simboli del 
+   * suo alfabeto di riferimento, false altrimenti. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">complete() { 
+    </span><span class="s0">boolean </span><span class="s1">complete = </span><span class="s0">true;</span><span class="s1"> 
+    HashSet alph = alphabet()</span><span class="s0">;</span><span class="s6">//ottengo l'alfabeto del dfa</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">while </span><span class="s1">(complete &amp;&amp; i &lt; numberOfStates) {</span><span class="s6">//ciclo finchè non trovo uno stato in cui non sia presente un simbolo dell'alfabeto</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(Object c : alph) { 
+        </span><span class="s0">if </span><span class="s1">(move(i</span><span class="s0">, </span><span class="s1">(Character) c) == -</span><span class="s5">1</span><span class="s1">) complete = </span><span class="s0">false;</span><span class="s1"> 
+      } 
+      i++</span><span class="s0">;</span><span class="s1"> 
+    } 
+    </span><span class="s0">return </span><span class="s1">complete</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 2.5 
+   * Stampa una rappresentazione testuale dell'automa da 
+   * visualizzare con </span><span class="s4">&lt;a href=&quot;http://www.graphviz.org&quot;&gt;</span><span class="s2">GraphViz</span><span class="s4">&lt;/a&gt;</span><span class="s2">. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">name Nome dell'automa. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">String toDOT(String name) { 
+    String dot = </span><span class="s7">&quot;digraph &quot; </span><span class="s1">+ name + </span><span class="s7">&quot;{</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    dot += </span><span class="s7">&quot;rankdir=LR;</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    dot += </span><span class="s7">&quot;node [shape = doublecircle];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">for </span><span class="s1">(Integer i : finalStates) { </span><span class="s6">//prendo gli stati finali perchè ho bisogno di segnarli con un cerchio doppio</span><span class="s1"> 
+      dot += </span><span class="s7">&quot;q&quot; </span><span class="s1">+ i + </span><span class="s7">&quot;;</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+    dot += </span><span class="s7">&quot;node [shape = circle];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">for </span><span class="s1">(Move m : transitions.keySet()) { 
+      dot += </span><span class="s7">&quot;q&quot; </span><span class="s1">+ m.start + </span><span class="s7">&quot; -&gt; q&quot; </span><span class="s1">+ transitions.get(m) + </span><span class="s7">&quot; [ label = </span><span class="s0">\&quot;</span><span class="s7">&quot; </span><span class="s1">+ m.ch + </span><span class="s7">&quot;</span><span class="s0">\&quot;</span><span class="s7"> ];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s6">//q[stato di inizio mossa] -&gt; q[valore associato alla mossa] [ label = \carattere di transizione</span><span class="s1"> 
+    } 
+ 
+    dot += </span><span class="s7">&quot;}&quot;</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return </span><span class="s1">dot</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio - 2.6 
+   * Fornisce la rappresentazione in formato dot di un DFA ottimizzando la versione normale. 
+   * l'ottimizzazione consiste nell'associare ad una transizione p--&gt;q tutti i simboli che compaiono come etichette di 
+   * tale transizione.   * 
+   * </span><span class="s3">@param </span><span class="s2">name nome dell'automa 
+   * </span><span class="s3">@return </span><span class="s2">String rappresentazione in formato dot del DFA 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">String toDOTOptimized(String name) { 
+    String dot = </span><span class="s7">&quot;digraph &quot; </span><span class="s1">+ name + </span><span class="s7">&quot;{</span><span class="s0">\n</span><span class="s7">rankdir=LR;</span><span class="s0">\n</span><span class="s7">node [shape = doublecircle];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s2">/** 
+     * identifico gli stati finali con un cerchio doppio 
+     */</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(Integer fin : </span><span class="s0">this</span><span class="s1">.finalStates) { 
+      dot += </span><span class="s7">&quot;q&quot; </span><span class="s1">+ fin + </span><span class="s7">&quot;;</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    } 
+    </span><span class="s2">/** 
+     * I nodi avranno la forma di un cerchio 
+     */</span><span class="s1"> 
+    dot += </span><span class="s7">&quot;node [shape = circle];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s2">/** 
+     * Associa ad una mossa uno stato 
+     */</span><span class="s1"> 
+    HashMap&lt;Move</span><span class="s0">, </span><span class="s1">Integer&gt; tmp = </span><span class="s0">new </span><span class="s1">HashMap&lt;Move</span><span class="s0">, </span><span class="s1">Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+    HashSet&lt;Character&gt; result</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s2">/** 
+     * cicla su tutte le mosse 
+     */</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(Move move : transitions.keySet()) { 
+      result = </span><span class="s0">new </span><span class="s1">HashSet&lt;Character&gt;()</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s2">/** 
+       * se mossa gia' analizzata, salta iterazione 
+       */</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(tmp.containsKey(move)) { 
+        </span><span class="s0">continue;</span><span class="s1"> 
+      } 
+      result.add(move.ch)</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s2">/** 
+       * ri-cicla su tutte le mosse 
+       */</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(Move mv : transitions.keySet()) { 
+        </span><span class="s2">/** 
+         * cicla e confronta se ci sono delle corrispondenze tra stato 
+         * di partenza e di arrivo, ho trovato una transizione con medesimo stato iniziale e finale 
+         */</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(move.start == mv.start &amp;&amp; transitions.get(move) == transitions.get(mv)) { 
+          tmp.put(mv</span><span class="s0">, </span><span class="s1">transitions.get(mv))</span><span class="s0">;</span><span class="s1"> 
+          result.add(mv.ch)</span><span class="s0">;</span><span class="s6">//aggiungo il carattere al risultato</span><span class="s1"> 
+        } 
+      } 
+      </span><span class="s2">/** 
+       * aggiunge la nuova transizione al grafo 
+       */</span><span class="s1"> 
+      dot += </span><span class="s7">&quot;q&quot; </span><span class="s1">+ move.start + </span><span class="s7">&quot; -&gt; q&quot; </span><span class="s1">+ transitions.get(move) + </span><span class="s7">&quot; [ label = </span><span class="s0">\&quot;</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">int </span><span class="s1">j = </span><span class="s5">0</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s2">/** 
+       * aggiungo i caratteri che ho trovato e li faccio comparire nell'elenco dei caratteri responsabili della transizione 
+       */</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(Character c : result) { 
+        </span><span class="s0">if </span><span class="s1">(j != </span><span class="s5">0</span><span class="s1">) { 
+          dot += </span><span class="s7">&quot;,&quot; </span><span class="s1">+ c</span><span class="s0">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+          dot += c</span><span class="s0">;</span><span class="s1"> 
+          j++</span><span class="s0">;</span><span class="s1"> 
+        } 
+      } 
+      dot += </span><span class="s7">&quot;</span><span class="s0">\&quot;</span><span class="s7"> ];</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+      tmp.put(move</span><span class="s0">, </span><span class="s1">transitions.get(move))</span><span class="s0">;</span><span class="s1"> 
+    } 
+    dot += </span><span class="s7">&quot;}&quot;</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return </span><span class="s1">dot</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 2.7 
+   * Stampa una classe Java con un metodo </span><span class="s4">&lt;code&gt;</span><span class="s2">scan</span><span class="s4">&lt;/code&gt; </span><span class="s2">che implementa 
+   * l'automa. 
+   * 
+   * </span><span class="s3">@param </span><span class="s2">name Nome della classe da generare. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">String toJava(String name) { 
+    </span><span class="s0">boolean </span><span class="s1">init = </span><span class="s0">false;</span><span class="s1"> 
+    String java = </span><span class="s7">&quot;public class &quot; </span><span class="s1">+ name + </span><span class="s7">&quot;{ </span><span class="s0">\n\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    java += </span><span class="s7">&quot;        public static boolean Scan (String s) { </span><span class="s0">\n\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;            int state = 0; </span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;            int i = 0; </span><span class="s0">\n\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    java += </span><span class="s7">&quot;            while (state &gt;=0 &amp;&amp; i&lt;s.length()){ </span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;                final char ch = s.charAt(i++); </span><span class="s0">\n\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;                switch (state) { </span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">j = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">j &lt; numberOfStates</span><span class="s0">; </span><span class="s1">j++) { 
+      java += </span><span class="s7">&quot;                    case &quot; </span><span class="s1">+ j + </span><span class="s7">&quot;:</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(Move m : transitions.keySet()) { 
+        </span><span class="s0">if </span><span class="s1">(m.start == j &amp;&amp; init == </span><span class="s0">false</span><span class="s1">) { 
+          java += </span><span class="s7">&quot;                    if (ch == &quot; </span><span class="s1">+ m.ch + </span><span class="s7">&quot;)</span><span class="s0">\n</span><span class="s7"> &quot; </span><span class="s1">+ 
+                  </span><span class="s7">&quot;                        state = &quot; </span><span class="s1">+ transitions.get(m) + </span><span class="s7">&quot;;</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+          init = </span><span class="s0">true;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(m.start == j &amp;&amp; init == </span><span class="s0">true</span><span class="s1">) { 
+          java += </span><span class="s7">&quot;                    else if (ch == &quot; </span><span class="s1">+ m.ch + </span><span class="s7">&quot;)</span><span class="s0">\n</span><span class="s7"> &quot; </span><span class="s1">+ 
+                  </span><span class="s7">&quot;                        state = &quot; </span><span class="s1">+ transitions.get(m) + </span><span class="s7">&quot;;</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+        } 
+      } 
+      java += </span><span class="s7">&quot;</span><span class="s0">\n</span><span class="s7">                    else state = -1;</span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+              </span><span class="s7">&quot;                    break; </span><span class="s0">\n\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+      init = </span><span class="s0">false;</span><span class="s1"> 
+    } 
+ 
+    java += </span><span class="s7">&quot;                }</span><span class="s0">\n</span><span class="s7">             }</span><span class="s0">\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">for </span><span class="s1">(Integer i : finalStates) { 
+      java += </span><span class="s7">&quot;        return state == &quot; </span><span class="s1">+ i + </span><span class="s7">&quot;; </span><span class="s0">\n</span><span class="s7">    }</span><span class="s0">\n\n</span><span class="s7">&quot;</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+    java += </span><span class="s7">&quot;     public static void main(String [] args){</span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;         System.out.println(Scan(args[0]) ? </span><span class="s0">\&quot;</span><span class="s7">OK</span><span class="s0">\&quot;</span><span class="s7"> : </span><span class="s0">\&quot;</span><span class="s7">NOPE</span><span class="s0">\&quot;</span><span class="s7">&quot;</span><span class="s1"> 
+            + </span><span class="s7">&quot;);</span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;     }</span><span class="s0">\n</span><span class="s7">&quot; </span><span class="s1">+ 
+            </span><span class="s7">&quot;}&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">return </span><span class="s1">java</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 3.1 
+   * effettuo una visita in ampiezza del grafo a partire dal nodo q, 
+   * per ottenere l'insieme degli stati raggiungibili da q 
+   * </span><span class="s3">@param </span><span class="s2">q stato dell'automa 
+   * </span><span class="s3">@return </span><span class="s2">HashSet insieme degli stati raggiungibili da q 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">HashSet&lt;Integer&gt; reach(</span><span class="s0">int </span><span class="s1">q) { 
+    HashSet&lt;Integer&gt; s = </span><span class="s0">new </span><span class="s1">HashSet&lt;Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+    Queue&lt;Integer&gt; c = </span><span class="s0">new </span><span class="s1">LinkedList&lt;Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">boolean</span><span class="s1">[] r = </span><span class="s0">new boolean</span><span class="s1">[numberOfStates()]</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s2">/** 
+     * Inizializzare il vettore in modo tale che tutti gli elementi con indice 
+     * diverso da q siano false e l’elemento con indice q sia true. 
+     */</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; r.length</span><span class="s0">; </span><span class="s1">i++) { 
+      r[i] = i == q</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+    c.add(q)</span><span class="s0">;</span><span class="s1"> 
+    s.add(q)</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">while </span><span class="s1">(!c.isEmpty()) { 
+      </span><span class="s0">int </span><span class="s1">i = c.poll()</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(Character ch : alphabet()) { 
+        </span><span class="s0">int </span><span class="s1">move = move(i</span><span class="s0">, </span><span class="s1">ch)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(move != -</span><span class="s5">1 </span><span class="s1">&amp;&amp; !r[move]) { 
+          s.add(move)</span><span class="s0">;</span><span class="s1"> 
+          r[move] = </span><span class="s0">true;</span><span class="s1"> 
+          c.add(move)</span><span class="s0">;</span><span class="s1"> 
+        } 
+      } 
+    } 
+    </span><span class="s0">return </span><span class="s1">s</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 3.1 
+   * il metodo trova l'insieme degli stati pozzo dell'automa 
+   * Stato pozzo: stato che non ha un insieme di stati raggiungibili e non è uno stato finale 
+   * </span><span class="s3">@return </span><span class="s2">insieme degli stati pozzo dell'automa 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">HashSet&lt;Integer&gt; sink() { 
+    HashSet&lt;Integer&gt; s = </span><span class="s0">new </span><span class="s1">HashSet&lt;Integer&gt;()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates()</span><span class="s0">; </span><span class="s1">i++) { 
+      </span><span class="s0">if </span><span class="s1">(reach(i).size() == </span><span class="s5">1 </span><span class="s1">&amp;&amp; !finalState(i)) s.add(i)</span><span class="s0">;</span><span class="s1"> 
+    } 
+    </span><span class="s0">return </span><span class="s1">s</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 3.1 
+   * testa se l'automa pu accettare il linguaggio vuoto. 
+   * 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">true</span><span class="s4">&lt;/code&gt; </span><span class="s2">se l'automa accetta il linguaggio vuoto </span><span class="s4">&lt;code&gt;</span><span class="s2">false</span><span class="s4">&lt;/code&gt; </span><span class="s2">altrimenti. 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">empty() { 
+    </span><span class="s0">int </span><span class="s1">count = </span><span class="s5">0</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates()</span><span class="s0">; </span><span class="s1">i++) { 
+      count += reach(i).size()</span><span class="s0">;</span><span class="s1"> 
+    } 
+    </span><span class="s0">return </span><span class="s1">count == numberOfStates</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 3.2 
+   * samples ritorna un insieme di stringhe campione 
+   * accettate dall'automa, una per ogni stato finale dell'automa. 
+   * </span><span class="s3">@param </span><span class="s2">input stato di partenza 
+   * </span><span class="s3">@return </span><span class="s4">&lt;code&gt;</span><span class="s2">HashSet</span><span class="s4">&lt;Integer&gt; </span><span class="s2">result </span><span class="s4">&lt;/code&gt; </span><span class="s2">insieme degli stati raggiunti da input 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">HashSet&lt;StateWithExample&gt; samples(</span><span class="s0">int </span><span class="s1">input){ 
+    HashSet&lt;StateWithExample&gt; result = </span><span class="s0">new </span><span class="s1">HashSet&lt;StateWithExample&gt;()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">if</span><span class="s1">(numberOfStates==</span><span class="s5">0</span><span class="s1">) </span><span class="s0">return </span><span class="s1">result</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s6">// creo un array di booleani indicanti la raggiungibilità</span><span class="s1"> 
+    </span><span class="s0">boolean</span><span class="s1">[] r = </span><span class="s0">new boolean</span><span class="s1">[numberOfStates]</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s6">//stringa di supporto con i caratteri</span><span class="s1"> 
+    String[] s = </span><span class="s0">new </span><span class="s1">String[numberOfStates]</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">for</span><span class="s1">(</span><span class="s0">int </span><span class="s1">i=</span><span class="s5">0</span><span class="s0">; </span><span class="s1">i&lt;numberOfStates</span><span class="s0">; </span><span class="s1">i++){    </span><span class="s6">//tutto a false</span><span class="s1"> 
+      r[i] = </span><span class="s0">false;</span><span class="s1"> 
+      s[i] = </span><span class="s7">&quot;&quot;</span><span class="s0">;</span><span class="s1"> 
+    } 
+    r[input] = </span><span class="s0">true;                        </span><span class="s6">//lo stato di partenza è true</span><span class="s1"> 
+ 
+    </span><span class="s6">//inizializzo le variabili del ciclo di analisi</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">;                      </span><span class="s6">//stato analizzato</span><span class="s1"> 
+    </span><span class="s0">boolean </span><span class="s1">modificato = </span><span class="s0">false;     </span><span class="s6">//indica se sono state apportate modifiche</span><span class="s1"> 
+ 
+        </span><span class="s6">/* Bisonga ciclare finchè si modifica qualcosa */</span><span class="s1"> 
+    </span><span class="s0">do</span><span class="s1">{ 
+      </span><span class="s0">if</span><span class="s1">(r[i]){                                               </span><span class="s6">//se r[i] è raggiungibile</span><span class="s1"> 
+        </span><span class="s0">for</span><span class="s1">(Move m:transitions.keySet()){                   </span><span class="s6">//cicla tutte le mosse possibili</span><span class="s1"> 
+          </span><span class="s0">if</span><span class="s1">(m.start == i &amp;&amp; !r[transitions.get(m)]){     </span><span class="s6">//prendi quelle che interessano</span><span class="s1"> 
+            r[transitions.get(m)] = </span><span class="s0">true;               </span><span class="s6">//lo stato è raggiungibile</span><span class="s1"> 
+            s[transitions.get(m)] = s[i] + </span><span class="s7">&quot; &quot; </span><span class="s1">+ m.ch</span><span class="s0">;  </span><span class="s6">//aggiungo il carattere alla stringa dello stato</span><span class="s1"> 
+            modificato = </span><span class="s0">true;                          </span><span class="s6">//ho effettuato una modifica</span><span class="s1"> 
+          } 
+        } 
+      } 
+      i++</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">if</span><span class="s1">(i==numberOfStates&amp;&amp;modificato==</span><span class="s0">true</span><span class="s1">){            </span><span class="s6">//se sono alla fine e ho fatto modifiche</span><span class="s1"> 
+        modificato = </span><span class="s0">false;                             </span><span class="s6">//continua a ciclare</span><span class="s1"> 
+        i = </span><span class="s5">0</span><span class="s0">;                                          </span><span class="s6">//resettando l'indice</span><span class="s1"> 
+      } 
+    } 
+    </span><span class="s0">while</span><span class="s1">(i&lt;numberOfStates)</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s6">// per ogni stato raggiunto, se è finale lo inserisco nel risultato con la stringa calcolata</span><span class="s1"> 
+    </span><span class="s0">for</span><span class="s1">(</span><span class="s0">int </span><span class="s1">ii=</span><span class="s5">0</span><span class="s0">; </span><span class="s1">ii&lt;r.length</span><span class="s0">; </span><span class="s1">ii++){ 
+      </span><span class="s0">if</span><span class="s1">(r[ii] &amp;&amp; finalStates.contains(ii)){ 
+        </span><span class="s6">//creo un insieme di int(stato) e string associata</span><span class="s1"> 
+        result.add(</span><span class="s0">new </span><span class="s1">StateWithExample(ii</span><span class="s0">, </span><span class="s1">s[ii]))</span><span class="s0">;</span><span class="s1"> 
+      } 
+    } 
+ 
+    </span><span class="s0">return </span><span class="s1">result</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Classe di supporto a Samples 
+   * formata da 
+   * int -&gt; stato 
+   * example-&gt;Stringa che consente di raggiungere lo stato dallo stato iniziale 
+   */</span><span class="s1"> 
+  </span><span class="s0">private static class </span><span class="s1">StateWithExample { 
+ 
+    </span><span class="s0">private int </span><span class="s1">state</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">String example</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s0">public </span><span class="s1">StateWithExample(</span><span class="s0">int </span><span class="s1">state</span><span class="s0">, </span><span class="s1">String example) { 
+      </span><span class="s0">this</span><span class="s1">.state = state</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">this</span><span class="s1">.example = example</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public </span><span class="s1">String toString(){ 
+      </span><span class="s0">return </span><span class="s7">&quot;[state: &quot; </span><span class="s1">+ state + </span><span class="s7">&quot;; example: </span><span class="s0">\&quot;</span><span class="s7">&quot; </span><span class="s1">+ example + </span><span class="s7">&quot;</span><span class="s0">\&quot;</span><span class="s7">]&quot;</span><span class="s0">;</span><span class="s1"> 
+    } 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Esercizio 4.1 
+   * 
+   * </span><span class="s3">@return</span><span class="s2"> 
+   */</span><span class="s1"> 
+  </span><span class="s0">public </span><span class="s1">DFA minimize() { 
+    </span><span class="s0">boolean </span><span class="s1">bool = </span><span class="s0">true;</span><span class="s1"> 
+    HashSet&lt;Character&gt; alfabeto = </span><span class="s0">this</span><span class="s1">.alphabet()</span><span class="s0">;</span><span class="s1"> 
+    Iterator&lt;Character&gt; itAlfabeto</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s6">//1 Allocare una matrice eq di elementi di tipo boolean e dimensioni</span><span class="s1"> 
+    </span><span class="s6">// n x n, dove n e il numero di stati dell'automa A</span><span class="s1"> 
+    </span><span class="s0">boolean </span><span class="s1">eq[][] = </span><span class="s0">new boolean</span><span class="s1">[numberOfStates][numberOfStates]</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s6">//2 Inizializzare la matrice in modo tale che l’elemento eq[i][j] sia true</span><span class="s1"> 
+    </span><span class="s6">// se i e j sono entrambi finali o entrambi non finali, false altrimenti.</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates</span><span class="s0">; </span><span class="s1">i++) { 
+      </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">j = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">j &lt; numberOfStates</span><span class="s0">; </span><span class="s1">j++) { 
+        eq[i][j] = finalState(i)==finalState(j)</span><span class="s0">;</span><span class="s1"> 
+      } 
+    } 
+ 
+    </span><span class="s6">//3 Per ogni coppia di stati i e j ed ogni carattere ch tali che eq[i][j] è</span><span class="s1"> 
+    </span><span class="s6">// true ed eq[move(i,ch)][move(j,ch)] è false, si pone l'elemento</span><span class="s1"> 
+    </span><span class="s6">// eq[i][j] a false.</span><span class="s1"> 
+    </span><span class="s0">while </span><span class="s1">(bool) { 
+      bool = </span><span class="s0">false;</span><span class="s1"> 
+      </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates</span><span class="s0">; </span><span class="s1">i++) { 
+        </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">j = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">j &lt; numberOfStates</span><span class="s0">; </span><span class="s1">j++) { 
+          </span><span class="s0">if </span><span class="s1">(eq[i][j] == </span><span class="s0">true</span><span class="s1">){ 
+            itAlfabeto = alfabeto.iterator()</span><span class="s0">;</span><span class="s1"> 
+            </span><span class="s0">while </span><span class="s1">(itAlfabeto.hasNext()) { 
+              </span><span class="s0">char </span><span class="s1">ch = itAlfabeto.next()</span><span class="s0">;</span><span class="s1"> 
+              </span><span class="s0">if </span><span class="s1">(eq[move(i</span><span class="s0">, </span><span class="s1">ch)][move(j</span><span class="s0">, </span><span class="s1">ch)] == </span><span class="s0">false</span><span class="s1">) { 
+                eq[i][j] = </span><span class="s0">false;</span><span class="s1"> 
+                bool = </span><span class="s0">true;</span><span class="s1"> 
+              } 
+            } 
+          } 
+        } 
+      } 
+    } 
+ 
+    </span><span class="s6">//4 Ripetere il passo precedente fintantoche vengono scoperte nuove ´</span><span class="s1"> 
+    </span><span class="s6">// coppie di stati distinguibili</span><span class="s1"> 
+    </span><span class="s6">//A tal fine è stato aggiunto il while esterno</span><span class="s1"> 
+ 
+    </span><span class="s6">//5 Allocare un vettore m di elementi di tipo int e dimensione n e inizializzarlo</span><span class="s1"> 
+    </span><span class="s6">// in modo tale che l'elemento i-esimo sia lo stato indistinguibile da</span><span class="s1"> 
+    </span><span class="s6">// i con indice piu piccolo.</span><span class="s1"> 
+    </span><span class="s0">int</span><span class="s1">[] m = </span><span class="s0">new int</span><span class="s1">[numberOfStates]</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">k = -</span><span class="s5">1</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates</span><span class="s0">; </span><span class="s1">i++) { 
+      </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">j = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">j &lt; numberOfStates</span><span class="s0">; </span><span class="s1">j++) { 
+        </span><span class="s6">// prende la prima j sulla colonna che, incrociato con i, ha valore true(indistinguibile)</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(eq[i][j]) { 
+          m[i] = j</span><span class="s0">; </span><span class="s6">//nell'array di costruzione mettiamo j nella posizione i</span><span class="s1"> 
+          </span><span class="s0">if </span><span class="s1">(j &gt; k) { 
+            k = j</span><span class="s0">; </span><span class="s6">//num. stati da costruire</span><span class="s1"> 
+          } 
+          </span><span class="s0">break;</span><span class="s1"> 
+        } 
+      } 
+    } 
+ 
+    </span><span class="s6">//6 Sia k l'elemento piu grande del vettore m. Allocare e inizializzare</span><span class="s1"> 
+    </span><span class="s6">// un DFA B con k + 1 stati e tale che per ogni transizione da i a j</span><span class="s1"> 
+    </span><span class="s6">// etichettata ch in A esiste una transizione da m[i] a m[j] etichettata ch</span><span class="s1"> 
+    </span><span class="s6">// in B. Fare in modo che, se i è finale in A, allora m[i] sia finale in B.</span><span class="s1"> 
+    DFA b = </span><span class="s0">new </span><span class="s1">DFA(k + </span><span class="s5">1</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+    Move move</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s5">0</span><span class="s0">; </span><span class="s1">i &lt; numberOfStates</span><span class="s0">; </span><span class="s1">i++) {                  </span><span class="s6">//per ogni transazione da i</span><span class="s1"> 
+      itAlfabeto = alfabeto.iterator()</span><span class="s0">;</span><span class="s1"> 
+      </span><span class="s0">while </span><span class="s1">(itAlfabeto.hasNext()) { 
+        </span><span class="s0">char </span><span class="s1">ch = itAlfabeto.next()</span><span class="s0">;                        </span><span class="s6">//etichettata ch</span><span class="s1"> 
+        move = </span><span class="s0">new </span><span class="s1">Move(i</span><span class="s0">, </span><span class="s1">ch)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(transitions.get(move) != </span><span class="s0">null</span><span class="s1">) {                </span><span class="s6">//(se esiste)</span><span class="s1"> 
+          b.setMove(m[i]</span><span class="s0">, </span><span class="s1">ch</span><span class="s0">, </span><span class="s1">m[transitions.get(move)])</span><span class="s0">;  </span><span class="s6">//aggiungo una transazione da m[i] a m[j] etichetata ch</span><span class="s1"> 
+          </span><span class="s0">if </span><span class="s1">(</span><span class="s0">this</span><span class="s1">.finalState(i)) {                       </span><span class="s6">//se è finale</span><span class="s1"> 
+            b.addFinalState(m[i])</span><span class="s0">;                      </span><span class="s6">//lo imposto tale</span><span class="s1"> 
+          } 
+        } 
+      } 
+    } 
+ 
+    </span><span class="s0">return </span><span class="s1">b</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  </span><span class="s2">/** 
+   * Todo Esercizio 4.2 test 
+   * </span><span class="s3">@param </span><span class="s2">target 
+   * </span><span class="s3">@return</span><span class="s2"> 
+   */</span><span class="s1"> 
+  </span><span class="s0">public boolean </span><span class="s1">equivalentTo(DFA target) { 
+    DFA a = </span><span class="s0">this</span><span class="s1">.minimize()</span><span class="s0">;</span><span class="s1"> 
+    DFA b = target.minimize()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return </span><span class="s1">a.numberOfStates==b.numberOfStates &amp;&amp; a.finalStates.equals(b.finalStates) &amp;&amp; a.transitions.equals(b.transitions)</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  @Override 
+  </span><span class="s0">public boolean </span><span class="s1">equals(Object o) { 
+    </span><span class="s0">if </span><span class="s1">(</span><span class="s0">this </span><span class="s1">== o) </span><span class="s0">return true;</span><span class="s1"> 
+    </span><span class="s0">if </span><span class="s1">(o == </span><span class="s0">null </span><span class="s1">|| getClass() != o.getClass()) </span><span class="s0">return false;</span><span class="s1"> 
+    DFA dfa = (DFA) o</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">return </span><span class="s1">Objects.equals(numberOfStates</span><span class="s0">, </span><span class="s1">dfa.numberOfStates) &amp;&amp; 
+            Objects.equals(finalStates</span><span class="s0">, </span><span class="s1">dfa.finalStates) &amp;&amp; 
+            Objects.equals(transitions</span><span class="s0">, </span><span class="s1">dfa.transitions)</span><span class="s0">;</span><span class="s1"> 
+  } 
+ 
+  @Override 
+  </span><span class="s0">public int </span><span class="s1">hashCode() { 
+    </span><span class="s0">return </span><span class="s1">Objects.hash(numberOfStates</span><span class="s0">, </span><span class="s1">finalStates</span><span class="s0">, </span><span class="s1">transitions)</span><span class="s0">;</span><span class="s1"> 
+  } 
+} 
+ 
+</span></pre>
+</body>
+</html>
