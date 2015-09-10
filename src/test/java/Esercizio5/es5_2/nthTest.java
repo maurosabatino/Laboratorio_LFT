@@ -14,7 +14,6 @@ public class nthTest {
 	public void testNth() throws Exception {
 		for (int i = 0; i < 10; i++) {
 			NFA test = NFA.nth(i);
-			System.out.println("NFA: " + test.numberOfStates() + "; DFA: " + test.dfa().numberOfStates() + "; MIN: " + test.dfa().minimize().numberOfStates());
 		}
 	}
 

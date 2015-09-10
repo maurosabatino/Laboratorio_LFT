@@ -9,7 +9,7 @@ import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
 
 /**
- * TODO esercizio 5.1 altri test e javadoc
+ * esercizio 5.1
  * Implementare tutti i metodi incompleti della classe NFA mostrata nel Listato
  * 3. Per l'implementazione del metodo epsilonClosure fare riferimento
  * all'algoritmo in Tabella 3. Verificare il funzionamento del metodo dfa su

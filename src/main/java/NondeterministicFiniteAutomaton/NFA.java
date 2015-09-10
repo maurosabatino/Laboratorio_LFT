@@ -143,7 +143,7 @@ public class NFA
     public HashSet<Character> alphabet() {
         HashSet<Character> alphabet = new HashSet<Character>();
         for (Move m : transitions.keySet()) {
-            if(m.ch != NFA.EPSILON) alphabet.add(m.ch);
+            if(m.ch != NFA.EPSILON) alphabet.add(m.ch); //essendo hashset un insieme non ho duplicati
         }
         return alphabet;
     }
@@ -254,6 +254,7 @@ public class NFA
     }
 
     /**
+     * Esercizio - 5.3
      * Calcola l'automa a stati finiti deterministico equivalente.
      * @return DFA equivalente.
      */
@@ -300,6 +301,7 @@ public class NFA
         return dfa;
     }
     /**
+     * Esercizio 5.2
      * Calcola l'automa nfa con n+1 stati che riconosce le stringhe 0 e 1
      * tali che l'nesimo simbolo da dx sia 1
      * @param n il numero di stai dell'nfa
@@ -310,7 +312,7 @@ public class NFA
         out.addMove(0, '1', 0);
         out.addMove(0, '0', 0);
         if (n > 0) {
-            out.addMove(0, '1', 1);
+            out.addMove(0, '1', 1);//obbligo che si sia almeno un uno a destra
             for(int i=1;i<n;i++){
                 out.addMove(i, '1', i + 1);
                 out.addMove(i, '0', i + 1);

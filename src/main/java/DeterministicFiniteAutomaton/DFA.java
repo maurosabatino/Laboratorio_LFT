@@ -231,7 +231,7 @@ public class DFA {
 		/**
 		 * Associa ad una mossa uno stato
 		 */
-		HashMap<Move, Integer> tmp = new HashMap<Move, Integer>();
+		HashMap<Move, Integer>  tmp = new HashMap<Move, Integer>();
 		HashSet<Character> result;
 		/**
 		 * cicla su tutte le mosse
@@ -290,7 +290,7 @@ public class DFA {
 	 * @param name Nome della classe da generare.
 	 */
 	public String toJava(String name) {
-		boolean init = false;
+		boolean scanFirst = false;
 		String java = "public class " + name + "{ \n\n";
 
 		java += "        public static boolean Scan (String s) { \n\n" +
@@ -304,18 +304,18 @@ public class DFA {
 		for (int j = 0; j < numberOfStates; j++) {
 			java += "                    case " + j + ":\n";
 			for (Move m : transitions.keySet()) {
-				if (m.start == j && init == false) {
+				if (m.start == j && scanFirst == false) {
 					java += "                    if (ch == " + m.ch + ")\n " +
 									"                        state = " + transitions.get(m) + ";\n";
-					init = true;
-				} else if (m.start == j && init == true) {
+					scanFirst = true;
+				} else if (m.start == j && scanFirst == true) {
 					java += "                    else if (ch == " + m.ch + ")\n " +
 									"                        state = " + transitions.get(m) + ";\n";
 				}
 			}
 			java += "\n                    else state = -1;\n" +
 							"                    break; \n\n";
-			init = false;
+			scanFirst = false;
 		}
 
 		java += "                }\n             }\n";
@@ -483,31 +483,39 @@ public class DFA {
 	 * Esercizio 4.1
 	 * dato un automa deterministico ne crea uno che accetta lo stesso linguaggio,
 	 * ma con un numero di stati minimo.
-	 * per fare ci utilizza l'algoritmo denominato "riempi tabella",
+	 * per fare ciò utilizza l'algoritmo denominato "riempi tabella",
 	 * ovvero trova gli stati distignuibili
 	 *
 	 * @return DFA il dfa con un numero di stati minimo
 	 */
 	public DFA minimize() {
-		boolean bool = true;
+		boolean bool = true;// variabile booleana per indicare se ci sono ancora delle transizioni da analizzare
 		HashSet<Character> alfabeto = this.alphabet();
 		Iterator<Character> itAlfabeto;
 
-		//1 Allocare una matrice eq di elementi di tipo boolean e dimensioni
-		// n x n, dove n e il numero di stati dell'automa A
+
+		/**
+		 * 1 Allocare una matrice eq di elementi di tipo boolean e dimensioni
+		 * n x n, dove n e il numero di stati dell'automa
+		 */
 		boolean eq[][] = new boolean[numberOfStates][numberOfStates];
 
-		//2 Inizializzare la matrice in modo tale che l’elemento eq[i][j] sia true
-		// se i e j sono entrambi finali o entrambi non finali, false altrimenti.
+
+		/**
+		 * 2 Inizializzare la matrice in modo tale che l’elemento eq[i][j] sia true
+		 * se i e j sono entrambi finali o entrambi non finali, false altrimenti.
+		 */
 		for (int i = 0; i < numberOfStates; i++) {
 			for (int j = 0; j < numberOfStates; j++) {
-				eq[i][j] = finalState(i)==finalState(j);
+				eq[i][j] = finalState(i)==finalState(j);//parto con la selezione degli stati finali, che di sicuro sono indistinguibili
 			}
 		}
 
-		//3 Per ogni coppia di stati i e j ed ogni carattere ch tali che eq[i][j] è
-		// true ed eq[move(i,ch)][move(j,ch)] è false, si pone l'elemento
-		// eq[i][j] a false.
+
+		/**
+		 * 3 Per ogni coppia di stati i e j ed ogni carattere ch tali che eq[i][j] è
+		 * true ed eq[move(i,ch)][move(j,ch)] è false, si pone l'elemento eq[i][j] a false.
+		 */
 		while (bool) {
 			bool = false;
 			for (int i = 0; i < numberOfStates; i++) {
@@ -526,13 +534,21 @@ public class DFA {
 			}
 		}
 
-		//4 Ripetere il passo precedente fintantoche vengono scoperte nuove ´
-		// coppie di stati distinguibili
-		//A tal fine è stato aggiunto il while esterno
 
-		//5 Allocare un vettore m di elementi di tipo int e dimensione n e inizializzarlo
-		// in modo tale che l'elemento i-esimo sia lo stato indistinguibile da
-		// i con indice piu piccolo.
+		/**
+		 * 4 Ripetere il passo precedente fintantoche vengono scoperte nuove ´
+		 * coppie di stati distinguibili:
+		 * A tal fine è stato aggiunto il while esterno
+		 */
+
+
+
+		/**
+		 * 5 Allocare un vettore m di elementi di tipo int e dimensione n e inizializzarlo
+		 * in modo tale che l'elemento i-esimo sia lo stato indistinguibile da
+		 * i con indice piu piccolo.
+		 * vado a creare le classi di equivalenza
+		 */
 		int[] m = new int[numberOfStates];
 		int k = -1;
 		for (int i = 0; i < numberOfStates; i++) {
@@ -541,17 +557,20 @@ public class DFA {
 				if (eq[i][j]) {
 					m[i] = j; //nell'array di costruzione mettiamo j nella posizione i
 					if (j > k) {
-						k = j; //num. stati da costruire
+						k = j; //num. degli stati che mi servono per costruire l'automa minimo
 					}
 					break;
 				}
 			}
 		}
 
-		//6 Sia k l'elemento piu grande del vettore m. Allocare e inizializzare
-		// un DFA B con k + 1 stati e tale che per ogni transizione da i a j
-		// etichettata ch in A esiste una transizione da m[i] a m[j] etichettata ch
-		// in B. Fare in modo che, se i è finale in A, allora m[i] sia finale in B.
+		/**
+		 * 6 Sia k l'elemento piu grande del vettore m. Allocare e inizializzare
+		 * un DFA B con k + 1 stati e tale che per ogni transizione da i a j
+		 * etichettata ch in A esiste una transizione da m[i] a m[j] etichettata chin B.
+		 * Fare in modo che, se i è finale in A, allora m[i] sia finale in B.
+		 * Ora siamo giunti alla fine e siamo pronti per costruire l'automa minimo
+		 */
 		DFA b = new DFA(k + 1);
 		Move move;
 		for (int i = 0; i < numberOfStates; i++) {                  //per ogni transazione da i
@@ -573,14 +592,18 @@ public class DFA {
 
 	/**
 	 * Esercizio 4.2
-	 * @param target automa sul quale si vuole effettuare il test di uguaglianza
+	 * dopo aver effettuato la minimizzazione dei dfa, se gli stati iniziali sono indistinguibili,
+	 * allora i due automi sono equivalenti
+	 * @param target automa sul quale si vuole effettuare il test di equivalenza
 	 * @return <code>True</code> se l'automa passato come parametro è eqivalente all'automa utilizzato <code>false</code> altrimenti
 	 *
 	 */
 	public boolean equivalentTo(DFA target) {
-		DFA a = this.minimize();
+		DFA a = this.minimize(); //l'automa minimp è equivalente all'automa di partenza
 		DFA b = target.minimize();
-		return a.numberOfStates==b.numberOfStates && a.finalStates.equals(b.finalStates) && a.transitions.equals(b.transitions);
+		return     a.numberOfStates==b.numberOfStates
+						&& a.finalStates.equals(b.finalStates)
+						&& a.transitions.equals(b.transitions);
 	}
 
 	@Override

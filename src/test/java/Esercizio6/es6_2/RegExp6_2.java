@@ -27,6 +27,7 @@ public class RegExp6_2 {
 	public void setUpRegexp() {
 		// /*
 		RegExpSequence seq1=new RegExpSequence(new RegExpSymbol('/'),new RegExpSymbol('*'));
+
 		/// /////////////////////////////
 		// {c}+
 		RegExpSequence seqt1=new RegExpSequence(new RegExpSymbol('c'),new RegExpStar(new RegExpSymbol('c')));
@@ -38,6 +39,7 @@ public class RegExp6_2 {
 		RegExpStar star2=new RegExpStar(new RegExpSymbol('*'));
 		// {*}*U({c}+.{/}*)*
 		RegExpStar choice=new RegExpStar(new RegExpChoice(star2,seqt2));
+
 		/// /////////////////////////////
 		// /*.{*}*U({c}+{/}*)
 		RegExpSequence seq2=new RegExpSequence(seq1,choice);
@@ -52,28 +54,14 @@ public class RegExp6_2 {
 
 	@Test
 	public void testAccept() throws Exception {
+
 		DFA minimized = regex.dfa().minimize();
+		System.out.println(minimized.toDOT("6.2"));
 		assertTrue(minimized.scan("/****/"));
 		assertTrue(minimized.scan("/*c*c*/"));
+		assertFalse(minimized.scan("c"));
 		assertFalse(minimized.scan("/*/"));
 		assertFalse(minimized.scan("/**/**/"));
 	}
 
-	@Test
-	public void testNFA() throws Exception {
-
-
-	}
-
-	@Test
-	public void testDFA() throws Exception {
-
-
-	}
-
-	@Test
-	public void testDFAMin() throws Exception {
-
-
-	}
 }

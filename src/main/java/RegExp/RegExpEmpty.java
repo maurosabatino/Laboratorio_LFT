@@ -2,6 +2,9 @@ package RegExp;
 
 import NondeterministicFiniteAutomaton.NFA;
 
+/**
+ * per rappresentare una foglia vuota
+ */
 public class RegExpEmpty implements RegExp{
 
 

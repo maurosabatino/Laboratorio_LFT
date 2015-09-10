@@ -2,6 +2,9 @@ package RegExp;
 
 import NondeterministicFiniteAutomaton.NFA;
 
+/**
+ * per rappresentare una foglia contenente un simbolo come a o b
+ */
 public class RegExpSymbol implements RegExp {
     private char ch;
 

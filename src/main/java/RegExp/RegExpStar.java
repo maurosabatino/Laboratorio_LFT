@@ -2,6 +2,9 @@ package RegExp;
 
 import NondeterministicFiniteAutomaton.NFA;
 
+/**
+ * per rappresentare un nodo *, la chiusura di Kleene.
+ */
 public class RegExpStar implements RegExp{
     private RegExp e1;
 

@@ -2,6 +2,9 @@ package RegExp;
 
 import NondeterministicFiniteAutomaton.NFA;
 
+/**
+ * per rappresentare un nodo +, la scelta;
+ */
 public class RegExpChoice implements RegExp{
 	private RegExp e1;
 	private RegExp e2;

@@ -2,6 +2,9 @@ package RegExp;
 
 import NondeterministicFiniteAutomaton.NFA;
 
+/**
+ *  per rappresentare un nodo ., la composizione sequenziale;
+ */
 public class RegExpSequence implements RegExp {
 	private RegExp e1;
 	private RegExp e2;
