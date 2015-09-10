@@ -481,8 +481,12 @@ public class DFA {
 
 	/**
 	 * Esercizio 4.1
+	 * dato un automa deterministico ne crea uno che accetta lo stesso linguaggio,
+	 * ma con un numero di stati minimo.
+	 * per fare ci utilizza l'algoritmo denominato "riempi tabella",
+	 * ovvero trova gli stati distignuibili
 	 *
-	 * @return
+	 * @return DFA il dfa con un numero di stati minimo
 	 */
 	public DFA minimize() {
 		boolean bool = true;
@@ -508,9 +512,9 @@ public class DFA {
 			bool = false;
 			for (int i = 0; i < numberOfStates; i++) {
 				for (int j = 0; j < numberOfStates; j++) {
-					if (eq[i][j] == true){
+					if (eq[i][j] == true){//abbiamo trovato uno stato inditinguibile
 						itAlfabeto = alfabeto.iterator();
-						while (itAlfabeto.hasNext()) {
+						while (itAlfabeto.hasNext()) {//ciclo finchè non trovo un indistinguibile
 							char ch = itAlfabeto.next();
 							if (eq[move(i, ch)][move(j, ch)] == false) {
 								eq[i][j] = false;
@@ -568,9 +572,10 @@ public class DFA {
 	}
 
 	/**
-	 * Todo Esercizio 4.2 test
-	 * @param target
-	 * @return
+	 * Esercizio 4.2
+	 * @param target automa sul quale si vuole effettuare il test di uguaglianza
+	 * @return <code>True</code> se l'automa passato come parametro è eqivalente all'automa utilizzato <code>false</code> altrimenti
+	 *
 	 */
 	public boolean equivalentTo(DFA target) {
 		DFA a = this.minimize();

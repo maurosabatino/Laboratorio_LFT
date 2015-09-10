@@ -209,7 +209,7 @@ public class NFA
         boolean[] r = new boolean[this.numberOfStates];
 
        /* Inizializzare il vettore in modo tale che tutti gli elementi con 
-       indice diverso da q siano false e l'elemento con indice q sia true. */
+       indice diverso da p siano false e l'elemento con indice q sia true. */
 
         for(int i = 0; i < this.numberOfStates; i++)
             r[i] = false;
